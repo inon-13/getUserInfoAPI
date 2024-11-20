@@ -286,6 +286,12 @@ async function collectUserInfo() {
           systemLanguages: navigator.languages || null,
           shortenedLanguages: mergeLanguages(navigator.languages) || null,
           baseLanguages: normalizeLanguages(navigator.languages) || null,
+        },
+        batteryInfo: {
+          level: navigator.battery?.level || null,
+          charging: navigator.battery?.charging || null,
+          chargingTime: navigator.battery?.chargingTime || null,
+          dischargingTime: navigator.battery?.dischargingTime || null
         }
       },
       screenInfo: {
@@ -324,6 +330,3 @@ async function collectUserInfo() {
     console.error("Error collecting user info:", err);
   }
 }
-
-var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
-console.log(battery); 
