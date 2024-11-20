@@ -322,25 +322,30 @@ async function collectUserInfo() {
       }
     };
 
-    async function getBatteryInfo() {
-      try {
-        const battery = await navigator.getBattery();
+    async function getBatteryInfo(info) {
+      if ('getBattery' in navigator) {
+        try {
+          const battery = await navigator.getBattery();
     
-         info.systemInfo.batteryInfo = {
-          charging: battery.charging,
-          chargingTime: battery.chargingTime,
-          dischargingTime: battery.dischargingTime,
-          level: battery.level,
-        };
+          // Update the info object with battery details
+          info.systemInfo = info.systemInfo || {}; // Ensure systemInfo exists
+          info.systemInfo.batteryInfo = {
+            charging: battery.charging,
+            chargingTime: battery.chargingTime === Infinity ? null : battery.chargingTime,
+            dischargingTime: battery.dischargingTime === Infinity ? null : battery.dischargingTime,
+            level: `${battery.level * 100}%`,
+          };
     
-        console.log("Battery Info:", batteryInfo);
-      } catch (error) {
-        console.error("Battery API not supported or error occurred:", error);
+          console.log("Updated Info with Battery Info:", info);
+        } catch (error) {
+          console.error("An error occurred while retrieving battery info:", error);
+        }
+      } else {
+        console.error("Battery API not supported on this browser.");
       }
     }
+    getBatteryInfo(info);
     
-    // Call the function
-    getBatteryInfo();
     
 
     return info;
