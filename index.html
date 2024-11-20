@@ -162,7 +162,7 @@
             // Update Time Info
             document.getElementById('timezone').textContent = info.timeInfo.timezone || 'N/A';
             document.getElementById('ip-timezone').textContent = info.timeInfo.ipTimezone || 'N/A';
-            document.getElementById('current-time').textContent = info.timeInfo.currentTime ? `${info.timeInfo.currentTime.date.monthName} ${info.timeInfo.currentTime.day}, ${info.timeInfo.currentTime.year} ${info.timeInfo.currentTime.time.hours}:${info.timeInfo.currentTime.time.minutes}:${info.timeInfo.currentTime.time.seconds}` : 'N/A';
+            document.getElementById('current-time').textContent = info.timeInfo.currentTime ? `${info.timeInfo.currentTime.date.monthName} ${info.timeInfo.currentTime.date.day}, ${info.timeInfo.currentTime.date.year} ${info.timeInfo.currentTime.time.hours}:${info.timeInfo.currentTime.time.minutes}:${info.timeInfo.currentTime.time.seconds}` : 'N/A';
             document.getElementById('potential-proxy').textContent = info.timeInfo.potentialProxy ? 'Yes' : 'No';
 
             // Update Browser State
