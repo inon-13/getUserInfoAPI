@@ -3,7 +3,6 @@
  * @license MIT
  */
 
-// Parse Date and Time into structured object
 function parseDateTime(dateTimeString) {
   const months = [
     "January",
@@ -93,7 +92,6 @@ function normalizeLanguages(langList) {
   return Object.values(result);
 }
 
-// Browser Detection
 function BrowserDetector(userAgent) {
   const BROWSERS = {
     chrome: "Google Chrome",
@@ -212,7 +210,6 @@ function BrowserDetector(userAgent) {
   return detected;
 }
 
-// Main function to collect all user info
 async function collectUserInfo() {
   try {
     const canvas = document.createElement("canvas");
@@ -324,6 +321,27 @@ async function collectUserInfo() {
         referrer: document.referrer || null,
       }
     };
+
+    async function getBatteryInfo() {
+      try {
+        const battery = await navigator.getBattery();
+    
+         info.systemInfo.batteryInfo = {
+          charging: battery.charging,
+          chargingTime: battery.chargingTime,
+          dischargingTime: battery.dischargingTime,
+          level: battery.level,
+        };
+    
+        console.log("Battery Info:", batteryInfo);
+      } catch (error) {
+        console.error("Battery API not supported or error occurred:", error);
+      }
+    }
+    
+    // Call the function
+    getBatteryInfo();
+    
 
     return info;
   } catch (err) {
