@@ -110,6 +110,9 @@ function BrowserDetector(userAgent) {
     safari: "Safari",
     samsungbrowser: "Samsung Browser",
     electron: "Electron",
+    webos: "WebOS",
+    blackberry: "BlackBerry",
+    iemobile: "Internet Explorer Mobile",
   };
 
   const PLATFORMS = {
@@ -126,6 +129,9 @@ function BrowserDetector(userAgent) {
     win: "Windows",
     "windows phone": "Windows Phone",
     xbox: "Microsoft Xbox",
+    webos: "WebOS",
+    blackberry: "BlackBerry",
+    ipod: "IPod",
   };
 
   function parseFloat2Dec(num) {
@@ -154,7 +160,11 @@ function BrowserDetector(userAgent) {
     /(applewebkit)[/]([\w.]+).*(safari)[/]([\w.]+)/.exec(uaLower) ||
     /(webkit)[/]([\w.]+)/.exec(uaLower) ||
     /(opera)(?:.*version|)[/]([\w.]+)/.exec(uaLower) ||
+    /(opera mini)[/]([\w.]+)/.exec(uaLower) ||
     /(msie) ([\w.]+)/.exec(uaLower) ||
+    /(webos)[/]([\w.]+)/.exec(uaLower) ||
+    /(blackberry)[/]([\w.]+)/.exec(uaLower) ||
+    /(iemobile)[/]([\w.]+)/.exec(uaLower) ||
     /(fennec)[/]([\w.]+)/.exec(uaLower) ||
     (uaLower.indexOf("trident") >= 0 && /(rv)(?::| )([\w.]+)/.exec(uaLower)) ||
     (uaLower.indexOf("compatible") < 0 &&
@@ -169,6 +179,8 @@ function BrowserDetector(userAgent) {
     /(windows phone)/.exec(uaLower) ||
     /(xbox)/.exec(uaLower) ||
     /(win)/.exec(uaLower) ||
+    /(webos)/.exec(uaLower) ||
+    /(blackberry)/.exec(uaLower) ||
     /(tablet)/.exec(uaLower) ||
     (/(android)/.test(uaLower) &&
       !/(mobile)/.test(uaLower) && ["androidTablet"]) ||
@@ -204,12 +216,14 @@ function BrowserDetector(userAgent) {
         platformName === "ipad" ||
         platformName === "ipod" ||
         platformName === "iphone" ||
-        platformName === "windows phone"
+        platformName === "windows phone" ||
+        platformName === "webos" ||
+        platformName === "blackberry" ||
+        /opera mini|iemobile/.test(uaLower)
     ),
   };
   return detected;
 }
-
 async function collectUserInfo() {
   try {
     const canvas = document.createElement("canvas");
