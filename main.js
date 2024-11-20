@@ -326,4 +326,4 @@ async function collectUserInfo() {
 }
 
 var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
-console.log(battery);
+console.log(battery); 
