@@ -319,6 +319,9 @@ async function collectUserInfo() {
       }
     };
 
+    var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery;
+    console.log(battery);
+
     return info;
   } catch (err) {
     console.error("Error collecting user info:", err);
