@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            margin: 40px 0;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .info-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #363636;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .info-section:hover {
+            background-color: #404040;
+            transform: translateX(5px);
+        }
+        .info-section h2 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+        .info-section p {
+            font-size: 14px;
+            margin: 8px 0;
+            transition: all 0.2s ease;
+        }
+        .info-section p:hover {
+            transform: translateX(5px);
+        }
+        .info-section p strong {
+            color: #fff;
+        }
+        .info-section p span {
+            color: #b3b3b3;
+        }
+        .data-value {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Information</h1>
+
+        <!-- Network Information -->
+        <div class="info-section" id="network-info">
+            <h2>Network Information</h2>
+            <p><strong>IP Address:</strong> <span id="ip-address">Loading...</span></p>
+            <p><strong>Hostname:</strong> <span id="hostname">Loading...</span></p>
+            <p><strong>Country:</strong> <span id="country">Loading...</span></p>
+            <p><strong>City:</strong> <span id="city">Loading...</span></p>
+            <p><strong>Region:</strong> <span id="region">Loading...</span></p>
+            <p><strong>Latitude:</strong> <span id="latitude">Loading...</span></p>
+            <p><strong>Longitude:</strong> <span id="longitude">Loading...</span></p>
+        </div>
+
+        <!-- System Information -->
+        <div class="info-section" id="system-info">
+            <h2>System Information</h2>
+            <p><strong>Platform:</strong> <span id="platform">Loading...</span></p>
+            <p><strong>Browser Name:</strong> <span id="browser-name">Loading...</span></p>
+            <p><strong>Browser Version:</strong> <span id="browser-version">Loading...</span></p>
+            <p><strong>Mobile:</strong> <span id="mobile">Loading...</span></p>
+            <p><strong>GPU Vendor:</strong> <span id="gpu-vendor">Loading...</span></p>
+            <p><strong>GPU Renderer:</strong> <span id="gpu-renderer">Loading...</span></p>
+            <p><strong>CPU Threads:</strong> <span id="cpu-threads">Loading...</span></p>
+            <p><strong>Device Memory:</strong> <span id="device-memory">Loading...</span></p>
+        </div>
+
+        <!-- Screen Information -->
+        <div class="info-section" id="screen-info">
+            <h2>Screen Information</h2>
+            <p><strong>Window Width:</strong> <span id="window-width">Loading...</span></p>
+            <p><strong>Window Height:</strong> <span id="window-height">Loading...</span></p>
+            <p><strong>Screen Width:</strong> <span id="screen-width">Loading...</span></p>
+            <p><strong>Screen Height:</strong> <span id="screen-height">Loading...</span></p>
+            <p><strong>Pixel Depth:</strong> <span id="pixel-depth">Loading...</span></p>
+            <p><strong>Orientation:</strong> <span id="orientation">Loading...</span></p>
+        </div>
+
+        <!-- Time Information -->
+        <div class="info-section" id="time-info">
+            <h2>Time Information</h2>
+            <p><strong>Timezone:</strong> <span id="timezone">Loading...</span></p>
+            <p><strong>IP Timezone:</strong> <span id="ip-timezone">Loading...</span></p>
+            <p><strong>Current Time:</strong> <span id="current-time">Loading...</span></p>
+            <p><strong>Potential Proxy:</strong> <span id="potential-proxy">Loading...</span></p>
+        </div>
+
+        <!-- Browser State -->
+        <div class="info-section" id="browser-state">
+            <h2>Browser State</h2>
+            <p><strong>Online:</strong> <span id="online">Loading...</span></p>
+            <p><strong>Touch Support:</strong> <span id="touch-support">Loading...</span></p>
+            <p><strong>Referrer:</strong> <span id="referrer">Loading...</span></p>
+        </div>
+    </div>
+
+    <script src="https://inon-13.github.io/getUserInfoAPI/main.js"></script>
+    <script>
+        async function displayUserInfo() {
+            const info = await collectUserInfo(); // Assuming collectUserInfo is already loaded from the external script
+
+            // Update Network Info
+            document.getElementById('ip-address').textContent = info.networkInfo.ip.address || 'N/A';
+            document.getElementById('hostname').textContent = info.networkInfo.ip.hostname || 'N/A';
+            document.getElementById('country').textContent = info.networkInfo.location.country || 'N/A';
+            document.getElementById('city').textContent = info.networkInfo.location.city || 'N/A';
+            document.getElementById('region').textContent = info.networkInfo.location.region || 'N/A';
+            document.getElementById('latitude').textContent = info.networkInfo.location.latitude || 'N/A';
+            document.getElementById('longitude').textContent = info.networkInfo.location.longitude || 'N/A';
+
+            // Update System Info
+            document.getElementById('platform').textContent = info.systemInfo.platform || 'N/A';
+            document.getElementById('browser-name').textContent = info.systemInfo.browser.name || 'N/A';
+            document.getElementById('browser-version').textContent = info.systemInfo.browser.version || 'N/A';
+            document.getElementById('mobile').textContent = info.systemInfo.browser.mobile ? 'Yes' : 'No';
+            document.getElementById('gpu-vendor').textContent = info.systemInfo.gpu.vendor || 'N/A';
+            document.getElementById('gpu-renderer').textContent = info.systemInfo.gpu.renderer || 'N/A';
+            document.getElementById('cpu-threads').textContent = info.systemInfo.cpu.threads || 'N/A';
+            document.getElementById('device-memory').textContent = info.systemInfo.memory.device || 'N/A';
+
+            // Update Screen Info
+            document.getElementById('window-width').textContent = info.screenInfo.size.window.width || 'N/A';
+            document.getElementById('window-height').textContent = info.screenInfo.size.window.height || 'N/A';
+            document.getElementById('screen-width').textContent = info.screenInfo.size.screen.width || 'N/A';
+            document.getElementById('screen-height').textContent = info.screenInfo.size.screen.height || 'N/A';
+            document.getElementById('pixel-depth').textContent = info.screenInfo.display.pixelDepth || 'N/A';
+            document.getElementById('orientation').textContent = info.screenInfo.display.orientation || 'N/A';
+
+            // Update Time Info
+            document.getElementById('timezone').textContent = info.timeInfo.timezone || 'N/A';
+            document.getElementById('ip-timezone').textContent = info.timeInfo.ipTimezone || 'N/A';
+            document.getElementById('current-time').textContent = info.timeInfo.currentTime ? `${info.timeInfo.currentTime.date.monthName} ${info.timeInfo.currentTime.day}, ${info.timeInfo.currentTime.year} ${info.timeInfo.currentTime.time.hours}:${info.timeInfo.currentTime.time.minutes}:${info.timeInfo.currentTime.time.seconds}` : 'N/A';
+            document.getElementById('potential-proxy').textContent = info.timeInfo.potentialProxy ? 'Yes' : 'No';
+
+            // Update Browser State
+            document.getElementById('online').textContent = info.browserState.online ? 'Yes' : 'No';
+            document.getElementById('touch-support').textContent = info.browserState.touchSupport ? 'Yes' : 'No';
+            document.getElementById('referrer').textContent = info.browserState.referrer || 'N/A';
+        }
+
+        // Call the function to display user info when the page loads
+        displayUserInfo();
+    </script>
+</body>
+</html>
