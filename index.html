@@ -131,7 +131,7 @@
     <script>
         async function displayUserInfo() {
             const info = await collectUserInfo(); // Assuming collectUserInfo is already loaded from the external script
-
+            console.log(await info);
             // Update Network Info
             document.getElementById('ip-address').textContent = info.networkInfo.ip.address || 'N/A';
             document.getElementById('hostname').textContent = info.networkInfo.ip.hostname || 'N/A';
@@ -173,7 +173,6 @@
 
         // Call the function to display user info when the page loads
         displayUserInfo();
-        console.log(info);
     </script>
 </body>
 </html>
