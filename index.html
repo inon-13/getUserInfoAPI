@@ -96,6 +96,10 @@
             <p><strong>GPU Renderer:</strong> <span id="gpu-renderer">Loading...</span></p>
             <p><strong>CPU Threads:</strong> <span id="cpu-threads">Loading...</span></p>
             <p><strong>Device Memory:</strong> <span id="device-memory">Loading...</span></p>
+            <p><strong>Battery Level:</strong> <span id="battery-level">Loading...</span></p>
+            <p><strong>Battery Charging:</strong> <span id="battery-charging">Loading...</span></p>
+            <p><strong>Battery Charging Time:</strong> <span id="battery-charging-time">Loading...</span></p>
+            <p><strong>Battery Discharging Time:</strong> <span id="battery-discharging-time">Loading...</span></p>
         </div>
 
         <!-- Screen Information -->
@@ -150,6 +154,10 @@
             document.getElementById('gpu-renderer').textContent = info.systemInfo.gpu.renderer || 'N/A';
             document.getElementById('cpu-threads').textContent = info.systemInfo.cpu.threads || 'N/A';
             document.getElementById('device-memory').textContent = info.systemInfo.memory.device || 'N/A';
+            document.getElementById('battery-level').textContent = info.systemInfo.batteryInfo.level ? `${Math.round(info.systemInfo.batteryInfo.level * 100)}%` : 'N/A';
+            document.getElementById('battery-charging').textContent = info.systemInfo.batteryInfo.charging ? 'Yes' : 'No';
+            document.getElementById('battery-charging-time').textContent = info.systemInfo.batteryInfo.chargingTime ? `${Math.round(info.systemInfo.batteryInfo.chargingTime / 60)} minutes` : 'N/A';
+            document.getElementById('battery-discharging-time').textContent = info.systemInfo.batteryInfo.dischargingTime ? `${Math.round(info.systemInfo.batteryInfo.dischargingTime / 60)} minutes` : 'N/A';
 
             // Update Screen Info
             document.getElementById('window-width').textContent = info.screenInfo.size.window.width || 'N/A';
