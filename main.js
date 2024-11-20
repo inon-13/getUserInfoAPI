@@ -333,15 +333,14 @@ async function collectUserInfo() {
             charging: battery.charging,
             chargingTime: battery.chargingTime === Infinity ? null : battery.chargingTime,
             dischargingTime: battery.dischargingTime === Infinity ? null : battery.dischargingTime,
-            level: `${battery.level * 100}%`,
+            level: battery.level * 100,
           };
-    
-          console.log("Updated Info with Battery Info:", info);
         } catch (error) {
           console.error("An error occurred while retrieving battery info:", error);
+          info.systemInfo.batteryInfo = `Error: ${error.message}`;
         }
       } else {
-        console.error("Battery API not supported on this browser.");
+        info.systemInfo.batteryInfo = null;
       }
     }
     getBatteryInfo(info);
