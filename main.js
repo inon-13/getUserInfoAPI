@@ -230,8 +230,26 @@ async function collectUserInfo() {
 
     const detector = new BrowserDetector(window.navigator.userAgent);
 
+    async function measurePing() {
+      const pingResult = {};
+      try {
+        const startTime = performance.now();
+        await fetch('https://wtfismyip.com/json', { method: "HEAD", cache: "no-cache" });
+    
+        const endTime = performance.now();
+        pingResult.ping = Math.round(endTime - startTime);
+        pingResult.testedURL = 'https://wtfismyip.com/json';
+      } catch (error) {
+        pingResult.error = "Error: " + error.message;
+      }
+    
+      return pingResult;
+    }
+
+
     const info = {
       networkInfo: {
+        PingInfo: (await measurePing()),
         ip: {
           address: wtfismyipdata.YourFuckingIPAddress || null,
           hostname: wtfismyipdata.YourFuckingHostname || null,
