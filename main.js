@@ -260,12 +260,76 @@ async function collectUserInfo() {
       return pingResult;
     }
 
+    async function convertIPv4ToIPv6(ipv4) {
+      // Validate the IPv4 address
+      const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
+      if (!ipv4Regex.test(ipv4)) {
+          throw new Error("Invalid IPv4 address");
+      }
+  
+      // Split the IPv4 address into its octets
+      const octets = ipv4.split('.').map(Number);
+  
+      // Convert to IPv6-mapped IPv4 address format
+      const ipv6 = `::ffff:${octets[0].toString(16)}${octets[1].toString(16)}:${octets[2].toString(16)}${octets[3].toString(16)}`;
+  
+      return ipv6;
+  }
+
+  function convertIPv4ToFullIPv6(ipv4) {
+    // Validate the IPv4 address
+    const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
+    if (!ipv4Regex.test(ipv4)) {
+        throw new Error("Invalid IPv4 address");
+    }
+
+    // Split the IPv4 address into its octets
+    const octets = ipv4.split('.').map(Number);
+
+    // Convert each octet to hexadecimal and pad to 2 digits
+    const hexOctets = octets.map(octet => octet.toString(16).padStart(2, '0'));
+
+    // Combine into full IPv6 format
+    const ipv6 = `0000:0000:0000:0000:0000:ffff:${hexOctets[0]}${hexOctets[1]}:${hexOctets[2]}${hexOctets[3]}`;
+
+    return ipv6;
+}
+
+function ipv4ToInteger(ipv4) {
+  // Validate the IPv4 address
+  const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
+  if (!ipv4Regex.test(ipv4)) {
+      throw new Error("Invalid IPv4 address");
+  }
+
+  // Split into octets and calculate integer
+  const octets = ipv4.split('.').map(Number);
+  const integer = (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3];
+  return integer;
+}
+
+function ipv4ToHex(ipv4) {
+  // Validate the IPv4 address
+  const ipv4Regex = /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
+  if (!ipv4Regex.test(ipv4)) {
+      throw new Error("Invalid IPv4 address");
+  }
+
+  // Split into octets, convert each to hex, and join
+  const octets = ipv4.split('.').map(Number);
+  const hex = octets.map(octet => octet.toString(16).padStart(2, '0')).join('');
+  return `0x${hex}`;
+}
 
     const info = {
       networkInfo: {
         PingInfo: (await measurePing()),
         ip: {
-          address: wtfismyipdata.YourFuckingIPAddress || null,
+          v4: wtfismyipdata.YourFuckingIPAddress || null,
+          v6short: await convertIPv4ToIPv6(wtfismyipdata.YourFuckingIPAddress) || null,
+          v6long: await convertIPv4ToFullIPv6(wtfismyipdata.YourFuckingIPAddress) || null,
+          integer: ipv4ToInteger(wtfismyipdata.YourFuckingIPAddress) || null,
+          hex: ipv4ToHex(wtfismyipdata.YourFuckingIPAddress) || null,
           hostname: wtfismyipdata.YourFuckingHostname || null,
         },
         location: {
