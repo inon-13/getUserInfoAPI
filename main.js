@@ -323,6 +323,7 @@ function ipv4ToHex(ipv4) {
 
     const info = {
       networkInfo: {
+        generation: navigator.connection.effectiveType.toUpperCase(),
         PingInfo: (await measurePing()),
         ip: {
           v4: wtfismyipdata.YourFuckingIPAddress || null,
