@@ -629,7 +629,7 @@ const info = {
           return result.isPrivate;
         }) || null,
         localStorageSupported: checkLocalStorageSupport() || null,
-        adBlocker: (await AdsAndScriptsDetection().then(ads => {return ads.summary.blocked}) >= 0) ? true : false,      }
+      }
     };
     return info;
   } catch (e) {
