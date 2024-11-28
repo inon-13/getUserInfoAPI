@@ -321,6 +321,178 @@ function ipv4ToHex(ipv4) {
   return `0x${hex}`;
 }
 
+  function checkLocalStorageSupport() {
+      try {
+          const testKey = "test";
+          localStorage.setItem(testKey, "value");
+          localStorage.removeItem(testKey);
+          return true;
+      } catch {
+          return false;
+      }
+  }
+    // Detect ad blockers
+ function detectAdBlocker() {
+      const bait = document.createElement("div");
+      bait.className = "ad-banner"; // Common ad-related class name
+      bait.style.cssText =
+          "width: 1px; height: 1px; position: absolute; top: -9999px;";
+
+      document.body.appendChild(bait);
+
+      const isBlocked = window.getComputedStyle(bait).display === "none";
+      document.body.removeChild(bait);
+
+      return isBlocked;
+  }
+
+
+/*!
+ *
+ * detectIncognito v1.3.7
+ *
+ * https://github.com/Joe12387/detectIncognito
+ *
+ * MIT License
+ *
+ * Copyright (c) 2021 - 2024 Joe Rutkowski <Joe@dreggle.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Please keep this comment intact in order to properly abide by the MIT License.
+ *
+ **/
+async function detectIncognitoMode() {
+  return new Promise((resolve, reject) => {
+      var browserName = "Unknown";
+
+      // Callback function to resolve the result
+      function __callback(isPrivate) {
+          resolve({ isPrivate, browserName });
+      }
+
+      // Identify Chromium-based browsers
+      function identifyChromium() {
+          var userAgent = navigator.userAgent;
+          if (userAgent.match(/Chrome/)) {
+              if (navigator.brave !== undefined) {
+                  browserName = "Brave";
+              } else if (userAgent.match(/Edg/)) {
+                  browserName = "Edge";
+              } else if (userAgent.match(/OPR/)) {
+                  browserName = "Opera";
+              } else {
+                  browserName = "Chrome";
+              }
+          } else {
+              browserName = "Chromium";
+          }
+      }
+
+      // Helper to test specific browser engines
+      function feid() {
+          var engineID = 0;
+          try {
+              eval("(-1).toFixed(-1);");
+          } catch (e) {
+              engineID = e.message.length;
+          }
+          return engineID;
+      }
+
+      // Check for Safari
+      function isSafari() {
+          return feid() === 44;
+      }
+
+      // Check for Chrome
+      function isChrome() {
+          return feid() === 51;
+      }
+
+      // Check for Firefox
+      function isFirefox() {
+          return feid() === 25;
+      }
+
+      // Safari-specific tests for private mode
+      function safariPrivateTest() {
+          var dbName = String(Math.random());
+          try {
+              window.indexedDB.open(dbName, 1).onupgradeneeded = function (event) {
+                  var db = event.target.result;
+                  try {
+                      db.createObjectStore("test", { autoIncrement: true }).put(new Blob());
+                      __callback(false);
+                  } catch (error) {
+                      __callback(true);
+                  } finally {
+                      db.close();
+                      window.indexedDB.deleteDatabase(dbName);
+                  }
+              };
+          } catch {
+              __callback(true);
+          }
+      }
+
+      // Chrome-specific test for private mode
+      function chromePrivateTest() {
+          if (navigator.webkitTemporaryStorage) {
+              navigator.webkitTemporaryStorage.queryUsageAndQuota(
+                  function (usedBytes, totalBytes) {
+                      __callback(Math.round(usedBytes / 1048576) < 2);
+                  },
+                  function () {
+                      __callback(true);
+                  }
+              );
+          } else {
+              __callback(true);
+          }
+      }
+
+      // Start the detection process
+      function main() {
+          identifyChromium();
+
+          if (isSafari()) {
+              browserName = "Safari";
+              safariPrivateTest();
+          } else if (isChrome()) {
+              chromePrivateTest();
+          } else if (isFirefox()) {
+              browserName = "Firefox";
+              __callback(false); // Firefox doesn't restrict storage in private mode
+          } else {
+              reject(new Error("Unable to determine browser"));
+          }
+      }
+
+      main();
+  });
+}
+var incognitoDetection = false;
+
+detectIncognitoMode().then(function(result) {
+  incognitoDetection = result;
+})
     const info = {
       networkInfo: {
         generation: navigator.connection.effectiveType.toUpperCase(),
@@ -416,6 +588,14 @@ function ipv4ToHex(ipv4) {
         online: navigator.onLine || null,
         touchSupport: "ontouchstart" in window || null,
         referrer: document.referrer || null,
+        doNotTrack: {
+          window: window.doNotTrack || null,
+          navigator: navigator.doNotTrack || null,
+        },
+        adBlockEnabled: detectAdBlocker() || null,
+        cookiesEnabled: navigator.cookieEnabled || null,
+        incognitoMode: incognitoDetection || null,
+        localStorageSupported: checkLocalStorageSupport() || null,
       }
     };
 
