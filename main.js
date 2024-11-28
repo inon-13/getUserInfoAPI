@@ -481,6 +481,59 @@ function checkLocalStorageSupport() {
   }
 }
 
+function detectAccessibilityFeatures() {
+  // Shared div for detections
+  const testDiv = document.createElement('div');
+  document.body.appendChild(testDiv);
+
+  // Detect high contrast mode
+  function detectHighContrast() {
+      testDiv.style.color = 'rgb(0,0,0)';
+      testDiv.style.backgroundColor = 'rgb(255,255,255)';
+      const style = window.getComputedStyle(testDiv);
+      return style.color === style.backgroundColor;
+  }
+
+  // Detect zoom level
+  function detectZoomLevel() {
+      testDiv.style.width = '100px';
+      const zoomLevel = Math.round((100 / testDiv.offsetWidth) * 100);
+      return zoomLevel; // Zoom level as a percentage
+  }
+
+  // Detect text size preference
+  function detectTextSizePreference() {
+      testDiv.style.fontSize = '1rem';
+      const computedFontSize = parseFloat(window.getComputedStyle(testDiv).fontSize);
+      return computedFontSize; // Font size in pixels
+  }
+
+  // Approximate screen reader detection
+  function detectScreenReader() {
+      testDiv.setAttribute('role', 'alert');
+      testDiv.style.position = 'absolute';
+      testDiv.style.left = '-9999px';
+      const detected = window.getComputedStyle(testDiv).position === 'absolute';
+      testDiv.removeAttribute('role'); // Clean up for other tests
+      testDiv.style.position = '';
+      testDiv.style.left = '';
+      return detected;
+  }
+
+  // Perform detections
+  const features = {
+      highContrast: detectHighContrast(),
+      zoomLevel: detectZoomLevel(),
+      textSize: detectTextSizePreference(),
+      screenReader: detectScreenReader(),
+  };
+
+  // Remove shared div after detection
+  testDiv.remove();
+
+  return features;
+}
+
 async function collectUserInfo() {
   try {
     const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
@@ -495,6 +548,9 @@ async function collectUserInfo() {
       `https://get.geojs.io/v1/ip/geo/${wtfismyipdata.YourFuckingIPAddress}.json`
     ).then((response) => response.json());
 
+    const moarInfo = await fetch(
+      `https://proxycheck.io/v2/${wtfismyipdata.YourFuckingIPAddress}?vpn=1&asn=1`
+    ).then((res) => res.json()).then((data) => data[wtfismyipdata.YourFuckingIPAddress]);
     const detector = new BrowserDetector(window.navigator.userAgent);
 
 
@@ -535,113 +591,124 @@ const hasBattery = navigator.getBattery() !== null && await navigator.getBattery
 
 const info = {
       networkInfo: {
-        downloadSpeed: navigator.connection.downlink || null,
+        downloadSpeed: navigator.connection.downlink || false,
         generation: navigator.connection.effectiveType.toUpperCase(),
         PingInfo: (await measurePing()),
         ip: {
-          v4: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv4").then(result => {return result}) || null,
-          v6short: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6").then(result => {return result}) || null,
-          v6long: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6-full").then(result => {return result}) || null,
-          integer: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "integer").then(result => {return result}) || null,
-          hex: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "hex").then(result => {return result}) || null,
-          hostname: wtfismyipdata.YourFuckingHostname || null,
+          v4: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv4").then(result => {return result}) || false,
+          v6short: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6").then(result => {return result}) || false,
+          v6long: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6-full").then(result => {return result}) || false,
+          integer: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "integer").then(result => {return result}) || false,
+          hex: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "hex").then(result => {return result}) || false,
+          hostname: wtfismyipdata.YourFuckingHostname || false,
         },
+        proxy: (moarInfo === "no") ? false : true,
+        type: moarInfo.type,
         location: {
-          country: wtfismyipdata.YourFuckingCountry || null,
+          currency: moarInfo.currency || null,
+          country: wtfismyipdata.YourFuckingCountry || false,
           fullLocation: {
-            full: wtfismyipdata.yourFuckingLocation || null,
+            full: wtfismyipdata.yourFuckingLocation || false,
             city: "city",
             region: "region",
             country: "country",
-          },
+            },
           countryCode: {
-            alpha2: wtfismyipdata.YourFuckingCountryCode || null,
-            alpha3: detailedIpInfo.country_code3 || null,
+            alpha2: wtfismyipdata.YourFuckingCountryCode || false,
+            alpha3: detailedIpInfo.country_code3 || false,
           },
-          city: detailedIpInfo.city || null,
-          region: detailedIpInfo.region || null,
-          continentCode: detailedIpInfo.continent_code || null,
-          latitude: detailedIpInfo.latitude || null,
-          longitude: detailedIpInfo.longitude || null,
+          city: detailedIpInfo.city || false,
+          region: detailedIpInfo.region || false,
+          continentCode: detailedIpInfo.continent_code || false,
+          latitude: detailedIpInfo.latitude || false,
+          longitude: detailedIpInfo.longitude || false,
         },
-        isp: wtfismyipdata.YourFuckingISP || null,
+        isp: wtfismyipdata.YourFuckingISP || false,
         organization: {
-          name: detailedIpInfo.organization_name || null,
-          asn: detailedIpInfo.asn || null,
+          name: detailedIpInfo.organization_name || false,
+          asn: detailedIpInfo.asn || false,
         },
-        torExit: wtfismyipdata.YourFuckingTorExit || null,
+        torExit: wtfismyipdata.YourFuckingTorExit || false,
       },
       systemInfo: {
-        platform: detector.platform || null,
+        platform: detector.platform || false,
         browser: {
-          name: detector.name || null,
-          version: detector.version || null,
-          versionShort: detector.shortVersion || null,
+          name: detector.name || false,
+          version: detector.version || false,
+          versionShort: detector.shortVersion || false,
           tablet: detector.tablet,
           mobile: detector.mobile,
         },
         gpu: {
-          vendor: GPUInfo().vendor || null,
-          renderer: GPUInfo().renderer || null,
+          vendor: GPUInfo().vendor || false,
+          renderer: GPUInfo().renderer || false,
         },
         cpu: {
-          threads: navigator.hardwareConcurrency || null,
+          threads: navigator.hardwareConcurrency || false,
         },
         memory: {
-          device: navigator.deviceMemory || null,
+          device: navigator.deviceMemory || false,
           browser: window.performance.memory
             ? Math.round(
                 window.performance.memory.jsHeapSizeLimit / 1024 / 1024
               )
-            : null,
+            : false,
         },
         languageInfo: {
-          systemLanguages: navigator.languages || null,
-          shortened: LanguageListParser(navigator.languages, false) || null,
-          baseLanguages: LanguageListParser(navigator.languages, true) || null,
+          systemLanguages: navigator.languages || false,
+          shortened: LanguageListParser(navigator.languages, false) || false,
+          baseLanguages: LanguageListParser(navigator.languages, true) || false,
         },
-        batteryInfo: hasBattery ? await navigator.getBattery().then(battery => {return {charging: battery.charging, chargingTime: battery.chargingTime, dischargingTime: battery.dischargingTime, level: battery.level}}) : null,
+        batteryInfo: hasBattery ? await navigator.getBattery().then(battery => {return {charging: battery.charging, chargingTime: battery.chargingTime, dischargingTime: battery.dischargingTime, level: battery.level}}) : false,
       },
       screenInfo: {
         size: {
           window: {
-            width: window.innerWidth || null,
-            height: window.innerHeight || null,
+            width: window.innerWidth || false,
+            height: window.innerHeight || false,
           },
           screen: {
-            width: window.screen.width || null,
-            height: window.screen.height || null,
+            width: window.screen.width || false,
+            height: window.screen.height || false,
           },
         },
         display: {
-          pixelDepth: window.screen.pixelDepth || null,
-          orientation: screen.orientation?.type || null,
+          pixelDepth: window.screen.pixelDepth || false,
+          orientation: screen.orientation?.type || false,
         },
       },
       timeInfo: {
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-        ipTimezone: detailedIpInfo.timezone || null,
-        currentTime: AdvancedDateParsing(new Date().toLocaleString()) || null,
-        potentialProxy:
-          Intl.DateTimeFormat().resolvedOptions().timeZone !==
-          detailedIpInfo.timezone,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || false,
+        ipTimezone: detailedIpInfo.timezone || false,
+        currentTime: AdvancedDateParsing(new Date().toLocaleString()) || false,
+        mismatchedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone !== detailedIpInfo.timezone,
       },
       browserState: {
-        online: navigator.onLine || null,
-        touchSupport: "ontouchstart" in window || null,
-        referrer: document.referrer || null,
+        online: navigator.onLine || false,
+        touchSupport: "ontouchstart" in window || false,
+        referrer: document.referrer || false,
         doNotTrack: {
-          window: window.doNotTrack || null,
-          navigator: navigator.doNotTrack || null,
+          window: window.doNotTrack || false,
+          navigator: navigator.doNotTrack || false,
         },
-        cookiesEnabled: navigator.cookieEnabled || null,
+        cookiesEnabled: navigator.cookieEnabled || false,
         isPrivate: await detectIncognito().then(function(result) {
           return result.isPrivate;
-        }) || null,
-        localStorageSupported: checkLocalStorageSupport() || null,
+        }) || false,
+        localStorageSupported: checkLocalStorageSupport() || false,
+        accessibility: {
+          reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches || false,
+          speechRecognition: 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window || false,
+          deviceOrientation: 'DeviceOrientationEvent' in window || false,
+          deviceMotion: 'DeviceMotionEvent' in window || false,
+          dark: window.matchMedia('(prefers-color-scheme: dark)').matches || false,
+          highContrast: detectAccessibilityFeatures().highContrast,
+          zoomLevel: detectAccessibilityFeatures().zoomLevel || false,
+          textSize: detectAccessibilityFeatures().textSize || false,
+          screenReader: detectAccessibilityFeatures().screenReader || false,
+        },
       }
     };
-
     const location = wtfismyipdata.YourFuckingLocation;
     
     // Now parse the location when it's definitely loaded

@@ -147,7 +147,8 @@
     <script src="./main.js"></script>
     <script>
         async function displayUserInfo() {
-            const info = await collectUserInfo();
+            const info = collectUserInfo();
+
             console.log(info);
             // Update Network Info
             document.getElementById('ip-address').textContent = info.networkInfo.ip.v4 || 'N/A';
