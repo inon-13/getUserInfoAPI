@@ -485,7 +485,7 @@ detectIncognito().then(function(result) {
         },
         adBlockEnabled: detectAdBlocker() || null,
         cookiesEnabled: navigator.cookieEnabled || null,
-        incognitoMode: incognitoDetection || null,
+        isPrivate: incognitoDetection.isPrivate || null,
         localStorageSupported: checkLocalStorageSupport() || null,
       }
     };
