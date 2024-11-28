@@ -543,6 +543,7 @@ const info = {
         },
         location: {
           country: wtfismyipdata.YourFuckingCountry || null,
+          fullLocation: wtfismyipdata.YourFuckingLocation || null,
           countryCode: {
             alpha2: wtfismyipdata.YourFuckingCountryCode || null,
             alpha3: detailedIpInfo.country_code3 || null,

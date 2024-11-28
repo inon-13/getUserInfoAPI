@@ -76,13 +76,21 @@
         <!-- Network Information -->
         <div class="info-section" id="network-info">
             <h2>Network Information</h2>
-            <p><strong>IP Address:</strong> <span id="ip-address">Loading...</span></p>
+            <p><strong>IP Address (IPv4):</strong> <span id="ip-address">Loading...</span></p>
+            <p><strong>IP Address (IPv6 Short):</strong> <span id="ip-address-v6short">Loading...</span></p>
+            <p><strong>IP Address (IPv6 Long):</strong> <span id="ip-address-v6long">Loading...</span></p>
+            <p><strong>IP Address (Integer):</strong> <span id="ip-address-integer">Loading...</span></p>
+            <p><strong>IP Address (Hex):</strong> <span id="ip-address-hex">Loading...</span></p>
             <p><strong>Hostname:</strong> <span id="hostname">Loading...</span></p>
             <p><strong>Country:</strong> <span id="country">Loading...</span></p>
             <p><strong>City:</strong> <span id="city">Loading...</span></p>
             <p><strong>Region:</strong> <span id="region">Loading...</span></p>
             <p><strong>Latitude:</strong> <span id="latitude">Loading...</span></p>
             <p><strong>Longitude:</strong> <span id="longitude">Loading...</span></p>
+            <p><strong>Location:</strong> <span id="location">Loading...</span></p>
+            <p><strong>Download Speed:</strong> <span id="download-speed">Loading...</span></p>
+            <p><strong>Connection Generation:</strong> <span id="connection-generation">Loading...</span></p>
+            <p><strong>Ping Info:</strong> <span id="ping-info">Loading...</span></p>
         </div>
 
         <!-- System Information -->
@@ -128,6 +136,11 @@
             <p><strong>Online:</strong> <span id="online">Loading...</span></p>
             <p><strong>Touch Support:</strong> <span id="touch-support">Loading...</span></p>
             <p><strong>Referrer:</strong> <span id="referrer">Loading...</span></p>
+            <p><strong>Do Not Track:</strong> <span id="do-not-track">Loading...</span></p>
+            <p><strong>Cookies Enabled:</strong> <span id="cookies-enabled">Loading...</span></p>
+            <p><strong>Private Browsing:</strong> <span id="is-private">Loading...</span></p>
+            <p><strong>Local Storage Supported:</strong> <span id="local-storage-supported">Loading...</span></p>
+            <p><strong>Ad Blocker:</strong> <span id="ad-blocker">Loading...</span></p>
         </div>
     </div>
 
@@ -138,14 +151,20 @@
             console.log(info);
             // Update Network Info
             document.getElementById('ip-address').textContent = info.networkInfo.ip.v4 || 'N/A';
+            document.getElementById('ip-address-v6short').textContent = info.networkInfo.ip.v6short || 'N/A';
+            document.getElementById('ip-address-v6long').textContent = info.networkInfo.ip.v6long || 'N/A';
+            document.getElementById('ip-address-integer').textContent = info.networkInfo.ip.integer || 'N/A';
+            document.getElementById('ip-address-hex').textContent = info.networkInfo.ip.hex || 'N/A';
             document.getElementById('hostname').textContent = info.networkInfo.ip.hostname || 'N/A';
             document.getElementById('country').textContent = info.networkInfo.location.country || 'N/A';
             document.getElementById('city').textContent = info.networkInfo.location.city || 'N/A';
             document.getElementById('region').textContent = info.networkInfo.location.region || 'N/A';
             document.getElementById('latitude').textContent = info.networkInfo.location.latitude || 'N/A';
             document.getElementById('longitude').textContent = info.networkInfo.location.longitude || 'N/A';
-
-            // Update System Info
+            document.getElementById('location').textContent = `${info.networkInfo.location.city}, ${info.networkInfo.location.region}, ${info.networkInfo.location.country}` || 'N/A';
+            document.getElementById('download-speed').textContent = info.networkInfo.downloadSpeed || 'N/A';
+            document.getElementById('connection-generation').textContent = info.networkInfo.generation || 'N/A';
+            document.getElementById('ping-info').textContent = info.networkInfo.PingInfo.ping || 'N/A';            // Update System Info
             document.getElementById('platform').textContent = info.systemInfo.platform || 'N/A';
             document.getElementById('browser-name').textContent = info.systemInfo.browser.name || 'N/A';
             document.getElementById('browser-version').textContent = info.systemInfo.browser.version || 'N/A';
@@ -177,6 +196,11 @@
             document.getElementById('online').textContent = info.browserState.online ? 'Yes' : 'No';
             document.getElementById('touch-support').textContent = info.browserState.touchSupport ? 'Yes' : 'No';
             document.getElementById('referrer').textContent = info.browserState.referrer || 'N/A';
+            document.getElementById('do-not-track').textContent = info.browserState.doNotTrack.window || 'N/A';
+            document.getElementById('cookies-enabled').textContent = info.browserState.cookiesEnabled ? 'Yes' : 'No';
+            document.getElementById('is-private').textContent = info.browserState.isPrivate ? 'Yes' : 'No';
+            document.getElementById('local-storage-supported').textContent = info.browserState.localStorageSupported ? 'Yes' : 'No';
+            document.getElementById('ad-blocker').textContent = info.browserState.adBlocker ? 'Yes' : 'No';
         }
 
         // Call the function to display user info when the page loads
