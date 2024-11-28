@@ -226,28 +226,60 @@ function BrowserDetector(userAgent) {
 }
 
 function detectAdBlocker() {
-  return new Promise((resolve) => {
-      // Create a bait element that mimics an ad
-      const bait = document.createElement('div');
-      bait.className = "ad-banner"; // Common class name for ad elements
-      bait.style.width = "1px"; // Tiny size so it's invisible
-      bait.style.height = "1px"; // Same here
-      bait.style.position = "absolute";
-      bait.style.top = "-9999px"; // Place it off-screen
+  var baitNode = null;
+  var findResult = null;
 
-      // Append the bait element to the body
-      document.body.appendChild(bait);
+  // Create the bait element (invisible, ad-like element)
+  function castBait() {
+      var baitStyle = 'width: 1px; height: 1px; position: absolute; left: -10000px; top: -1000px;';
+      baitNode = document.createElement('div');
+      baitNode.className = 'ad-banner'; // Class name typically used for ads
+      baitNode.style.cssText = baitStyle;
+      document.body.appendChild(baitNode);
+  }
 
-      // Check if the element is hidden or removed (which ad blockers often do)
-      const isBlocked = getComputedStyle(bait).display === "none";
+  // Check if the bait element was blocked by ad blockers
+  function checkBait() {
+      var body = document.body;
+      var found = false;
 
-      // Clean up the bait element
-      document.body.removeChild(bait);
+      // Test for issues by checking if the bait element's style is altered
+      if (window.getComputedStyle) {
+          var baitTemp = window.getComputedStyle(baitNode, null);
+          if (baitTemp.getPropertyValue('display') === 'none' || baitTemp.getPropertyValue('visibility') === 'hidden') {
+              found = true;
+          }
+      }
 
-      // Resolve based on whether the element was blocked or not
-      resolve(isBlocked);
-  });
+      // Set the result based on whether the bait was blocked
+      findResult = found;
+
+      // Clean up the bait node after checking
+      clearBaitNode();
+
+      return findResult;
+  }
+
+  // Clear the bait node from the DOM
+  function clearBaitNode() {
+      if (baitNode) {
+          try {
+              document.body.removeChild(baitNode);
+          } catch (ex) {
+              console.error('Error removing bait node: ' + ex.message);
+          }
+          baitNode = null;
+      }
+  }
+
+  // Start the test
+  castBait(); // Create the bait element
+  return checkBait(); // Check if the ad was blocked
 }
+
+// Correctly call the function to get the result
+var isAdBlocked = detectAdBlocker(); 
+console.log("Ad Blocker Detected: ", isAdBlocked);
 
 async function collectUserInfo() {
   try {
@@ -260,9 +292,7 @@ async function collectUserInfo() {
     const gpuRenderer =
       gl?.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || null;
 
-      document.removeChild(canvas);
-
-      const isAdBlocked = await detectAdBlocker();      
+      canvas.remove();     
 
     const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
       (res) => res.json()
@@ -359,20 +389,6 @@ function ipv4ToHex(ipv4) {
       } catch {
           return false;
       }
-  }
-    // Detect ad blockers
- function detectAdBlocker() {
-      const bait = document.createElement("div");
-      bait.className = "ad-banner"; // Common ad-related class name
-      bait.style.cssText =
-          "width: 1px; height: 1px; position: absolute; top: -9999px;";
-
-      document.body.appendChild(bait);
-
-      const isBlocked = window.getComputedStyle(bait).display === "none";
-      document.body.removeChild(bait);
-
-      return isBlocked;
   }
 
 
@@ -512,7 +528,7 @@ detectIncognito().then(function(result) {
           window: window.doNotTrack || null,
           navigator: navigator.doNotTrack || null,
         },
-        adBlockEnabled: isAdBlocked || null,
+        adBlockEnabled: detectAdBlocker || null,
         cookiesEnabled: navigator.cookieEnabled || null,
         isPrivate: incognitoDetection.isPrivate || null,
         localStorageSupported: checkLocalStorageSupport() || null,
