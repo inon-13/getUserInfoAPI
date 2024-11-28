@@ -528,6 +528,8 @@ async function collectUserInfo() {
 
 const hasBattery = await navigator.getBattery().then(battery => {return typeof battery.level === 'number'});
 
+console.log(wtfismyipdata);
+
 const info = {
       networkInfo: {
         downloadSpeed: navigator.connection.downlink || null,
