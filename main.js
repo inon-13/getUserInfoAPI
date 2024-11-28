@@ -225,63 +225,122 @@ function BrowserDetector(userAgent) {
   return detected;
 }
 
-function detectAdBlocker() {
-  var baitNode = null;
-  var findResult = null;
+async function testAds(advancedInfo = false) {
+  // List of ad service categories with companies inside each category
+  const adServices = {
+      "Amazon": {
+          "adtago": ['adtago.s3.amazonaws.com'],
+          "analytics": ['analyticsengine.s3.amazonaws.com', 'analytics.s3.amazonaws.com'],
+          "advice-ads": ['advice-ads.s3.amazonaws.com']
+      },
+      "Doubleclick": {
+          "stats": ['stats.g.doubleclick.net'],
+          "ad": ['ad.doubleclick.net'],
+          "static": ['static.doubleclick.net'],
+          "m": ['m.doubleclick.net'],
+          "mediavisor": ['mediavisor.doubleclick.net']
+      },
+      "Media.net": {
+          "static": ['static.media.net'],
+          "media": ['media.net'],
+          "adservetx": ['adservetx.media.net']
+      },
+      "Google Ads": {
+          "pagead2": ['pagead2.googlesyndication.com'],
+          "adservice": ['adservice.google.com'],
+          "googleadservices": ['pagead2.googleadservices.com'],
+          "afs": ['afs.googlesyndication.com']
+      },
+      "Adcolony": {
+          "ads30": ['ads30.adcolony.com'],
+          "adc3-launch": ['adc3-launch.adcolony.com'],
+          "events3alt": ['events3alt.adcolony.com'],
+          "wd": ['wd.adcolony.com']
+      },
+      "Social Media": {
+          "facebook": ['pixel.facebook.com', 'an.facebook.com'],
+          "linkedin": ['ads.linkedin.com', 'analytics.pointdrive.linkedin.com'],
+          "tiktok": ['ads-api.tiktok.com', 'analytics.tiktok.com'],
+          "twitter": ['ads.twitter.com'],
+          "pinterest": ['ads.pinterest.com']
+      },
+      "OEM": {
+          "yahoo": ['ads.yahoo.com', 'analytics.yahoo.com'],
+          "xiaomi": ['sdkconfig.ad.xiaomi.com'],
+          "samsung": ['samsungads.com']
+      }
+  };
 
-  // Create the bait element (invisible, ad-like element)
-  function castBait() {
-      var baitStyle = 'width: 1px; height: 1px; position: absolute; left: -10000px; top: -1000px;';
-      baitNode = document.createElement('div');
-      baitNode.className = 'ad-banner'; // Class name typically used for ads
-      baitNode.style.cssText = baitStyle;
-      document.body.appendChild(baitNode);
+  // Object to store the results for each service and company
+  const results = {
+      totalAdsTested: 0,
+      totalAdsBlocked: 0,
+      blockedAnyAds: false,
+      advancedInfo: advancedInfo ? {} : null
+  };
+
+  // Function to test if an ad is blocked
+  async function checkAd(url) {
+      try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
+
+          // Try to fetch the URL
+          const response = await fetch(`https://${url}/`, {
+              method: 'HEAD',
+              signal: controller.signal,
+              mode: 'no-cors'
+          });
+
+          if (response.status === 200) {
+              return false; // Ad is NOT blocked
+          } else {
+              return true; // Ad is blocked
+          }
+      } catch (error) {
+          return true; // Assume blocked if an error occurs
+      }
   }
 
-  // Check if the bait element was blocked by ad blockers
-  function checkBait() {
-      var body = document.body;
-      var found = false;
-
-      // Test for issues by checking if the bait element's style is altered
-      if (window.getComputedStyle) {
-          var baitTemp = window.getComputedStyle(baitNode, null);
-          if (baitTemp.getPropertyValue('display') === 'none' || baitTemp.getPropertyValue('visibility') === 'hidden') {
-              found = true;
-          }
+  // Loop through each category and company to test the ads
+  for (const category in adServices) {
+      if (advancedInfo) {
+          results.advancedInfo[category] = {};
       }
 
-      // Set the result based on whether the bait was blocked
-      findResult = found;
+      for (const company in adServices[category]) {
+          let totalAds = 0;
+          let blockedAds = 0;
 
-      // Clean up the bait node after checking
-      clearBaitNode();
+          // Test multiple URLs for each company
+          for (let i = 0; i < adServices[category][company].length; i++) {
+              const url = `${adServices[category][company][i]}/ad${i}.html`;
+              const isBlocked = await checkAd(url);
 
-      return findResult;
-  }
-
-  // Clear the bait node from the DOM
-  function clearBaitNode() {
-      if (baitNode) {
-          try {
-              document.body.removeChild(baitNode);
-          } catch (ex) {
-              console.error('Error removing bait node: ' + ex.message);
+              totalAds++;
+              results.totalAdsTested++;
+              if (isBlocked) {
+                  blockedAds++;
+                  results.totalAdsBlocked++;
+              }
           }
-          baitNode = null;
+
+          // Add results for each company
+          if (advancedInfo) {
+              results.advancedInfo[category][company] = {
+                  adsBlocked: blockedAds,
+                  adsTotal: totalAds,
+                  blockedAds: blockedAds > 0 // If at least one ad was blocked
+              };
+          }
+          if (blockedAds > 0) {
+              results.blockedAnyAds = true;
+          }
       }
   }
 
-  // Start the test
-  castBait(); // Create the bait element
-  return checkBait(); // Check if the ad was blocked
-}
-
-// Correctly call the function to get the result
-var isAdBlocked = detectAdBlocker(); 
-console.log("Ad Blocker Detected: ", isAdBlocked);
-
-async function collectUserInfo() {
+  return results;
+}async function collectUserInfo() {
   try {
     const canvas = document.createElement("canvas");
     const gl =
@@ -528,10 +587,10 @@ detectIncognito().then(function(result) {
           window: window.doNotTrack || null,
           navigator: navigator.doNotTrack || null,
         },
-        adBlockEnabled: detectAdBlocker || null,
         cookiesEnabled: navigator.cookieEnabled || null,
         isPrivate: incognitoDetection.isPrivate || null,
         localStorageSupported: checkLocalStorageSupport() || null,
+        adBlocker: await testAds().then(ads => {return ads.blockedAnyAds}) || null,
       }
     };
 
@@ -557,8 +616,6 @@ detectIncognito().then(function(result) {
       }
     }
     getBatteryInfo(info);
-    
-    
 
     return info;
   } catch (err) {
