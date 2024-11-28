@@ -161,7 +161,7 @@
             document.getElementById('region').textContent = info.networkInfo.location.region || 'N/A';
             document.getElementById('latitude').textContent = info.networkInfo.location.latitude || 'N/A';
             document.getElementById('longitude').textContent = info.networkInfo.location.longitude || 'N/A';
-            document.getElementById('location').textContent = info.networkInfo.location || 'N/A';
+            document.getElementById('location').textContent = `${info.networkInfo.location.city}, ${info.networkInfo.location.region}, ${info.networkInfo.location.country}` || 'N/A';
             document.getElementById('download-speed').textContent = info.networkInfo.downloadSpeed || 'N/A';
             document.getElementById('connection-generation').textContent = info.networkInfo.generation || 'N/A';
             document.getElementById('ping-info').textContent = info.networkInfo.PingInfo.ping || 'N/A';            // Update System Info

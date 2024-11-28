@@ -481,6 +481,26 @@ function checkLocalStorageSupport() {
   }
 }
 
+function fullLocationParser(locationString) {
+  if (typeof locationString !== 'string') {
+      throw new Error("Input must be a string in the format 'City, Region, Country'");
+  }
+
+  // Split the input string by commas
+  const parts = locationString.split(',').map(part => part.trim());
+
+  // Ensure the format matches the expected structure
+  if (parts.length !== 3) {
+      throw new Error("Invalid format. Expected 'City, Region, Country'");
+  }
+
+  // Extract the individual components
+  const [city, region, country] = parts;
+
+  // Return the result as an object
+  return { city, region, country };
+}
+
 async function collectUserInfo() {
   try {
     const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
@@ -545,7 +565,12 @@ const info = {
         },
         location: {
           country: wtfismyipdata.YourFuckingCountry || null,
-          fullLocation: wtfismyipdata.YourFuckingLocation || null,
+          fullLocation: {
+            full: wtfismyipdata.yourFuckingLocation || null,
+            city: fullLocationParser(wtfismyipdata.yourFuckingLocation).city || null,
+            region: fullLocationParser(wtfismyipdata.yourFuckingLocation).region || null,
+            country: fullLocationParser(wtfismyipdata.yourFuckingLocation).country || null,
+          },
           countryCode: {
             alpha2: wtfismyipdata.YourFuckingCountryCode || null,
             alpha3: detailedIpInfo.country_code3 || null,
