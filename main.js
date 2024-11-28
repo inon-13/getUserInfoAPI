@@ -224,6 +224,31 @@ function BrowserDetector(userAgent) {
   };
   return detected;
 }
+
+function detectAdBlocker() {
+  return new Promise((resolve) => {
+      // Create a bait element that mimics an ad
+      const bait = document.createElement('div');
+      bait.className = "ad-banner"; // Common class name for ad elements
+      bait.style.width = "1px"; // Tiny size so it's invisible
+      bait.style.height = "1px"; // Same here
+      bait.style.position = "absolute";
+      bait.style.top = "-9999px"; // Place it off-screen
+
+      // Append the bait element to the body
+      document.body.appendChild(bait);
+
+      // Check if the element is hidden or removed (which ad blockers often do)
+      const isBlocked = getComputedStyle(bait).display === "none";
+
+      // Clean up the bait element
+      document.body.removeChild(bait);
+
+      // Resolve based on whether the element was blocked or not
+      resolve(isBlocked);
+  });
+}
+
 async function collectUserInfo() {
   try {
     const canvas = document.createElement("canvas");
@@ -234,6 +259,10 @@ async function collectUserInfo() {
     const gpuVendor = gl?.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || null;
     const gpuRenderer =
       gl?.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || null;
+
+      document.removeChild(canvas);
+
+      const isAdBlocked = await detectAdBlocker();      
 
     const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
       (res) => res.json()
@@ -483,7 +512,7 @@ detectIncognito().then(function(result) {
           window: window.doNotTrack || null,
           navigator: navigator.doNotTrack || null,
         },
-        adBlockEnabled: detectAdBlocker() || null,
+        adBlockEnabled: isAdBlocked || null,
         cookiesEnabled: navigator.cookieEnabled || null,
         isPrivate: incognitoDetection.isPrivate || null,
         localStorageSupported: checkLocalStorageSupport() || null,
