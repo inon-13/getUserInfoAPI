@@ -481,31 +481,16 @@ function checkLocalStorageSupport() {
   }
 }
 
-function fullLocationParser(locationString) {
-  if (typeof locationString !== 'string') {
-      throw new Error("Input must be a string in the format 'City, Region, Country'");
-  }
-
-  // Split the input string by commas
-  const parts = locationString.split(',').map(part => part.trim());
-
-  // Ensure the format matches the expected structure
-  if (parts.length !== 3) {
-      throw new Error("Invalid format. Expected 'City, Region, Country'");
-  }
-
-  // Extract the individual components
-  const [city, region, country] = parts;
-
-  // Return the result as an object
-  return { city, region, country };
-}
-
 async function collectUserInfo() {
   try {
     const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
-      (res) => res.json()
+      (res) => {
+        return res.json()
+      }
     );
+
+    const wtfismylocation = await wtfismyipdata.yourFuckingLocation;
+
     const detailedIpInfo = await fetch(
       `https://get.geojs.io/v1/ip/geo/${wtfismyipdata.YourFuckingIPAddress}.json`
     ).then((response) => response.json());
@@ -548,8 +533,6 @@ async function collectUserInfo() {
 
 const hasBattery = await navigator.getBattery().then(battery => {return typeof battery.level === 'number'});
 
-console.log(wtfismyipdata);
-
 const info = {
       networkInfo: {
         downloadSpeed: navigator.connection.downlink || null,
@@ -567,9 +550,9 @@ const info = {
           country: wtfismyipdata.YourFuckingCountry || null,
           fullLocation: {
             full: wtfismyipdata.yourFuckingLocation || null,
-            city: fullLocationParser(wtfismyipdata.yourFuckingLocation).city || null,
-            region: fullLocationParser(wtfismyipdata.yourFuckingLocation).region || null,
-            country: fullLocationParser(wtfismyipdata.yourFuckingLocation).country || null,
+            city: "city",
+            region: "region",
+            country: "country",
           },
           countryCode: {
             alpha2: wtfismyipdata.YourFuckingCountryCode || null,
@@ -658,6 +641,20 @@ const info = {
         localStorageSupported: checkLocalStorageSupport() || null,
       }
     };
+
+    const location = wtfismyipdata.YourFuckingLocation;
+    
+    // Now parse the location when it's definitely loaded
+    if (location) {
+      const [city, region, country] = location.split(', ');
+      info.networkInfo.location.fullLocation = {
+        full: location,
+        city: city,
+        region: region, 
+        country: country
+      };
+    }
+
     return info;
   } catch (e) {
     console.error("Error collecting user info:", e);
