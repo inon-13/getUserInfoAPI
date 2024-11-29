@@ -481,58 +481,41 @@ function checkLocalStorageSupport() {
   }
 }
 
-function detectAccessibilityFeatures() {
-  // Shared div for detections
-  const testDiv = document.createElement('div');
-  document.body.appendChild(testDiv);
+// function detectAccessibilityFeatures() {
+//   // Shared div for detections
+//   const testDiv = document.createElement('div');
+//   document.body.appendChild(testDiv);
 
-  // Detect high contrast mode
-  function detectHighContrast() {
-      testDiv.style.color = 'rgb(0,0,0)';
-      testDiv.style.backgroundColor = 'rgb(255,255,255)';
-      const style = window.getComputedStyle(testDiv);
-      return style.color === style.backgroundColor;
-  }
+//   // Detect text size preference
+//   function detectTextSizePreference() {
+//       testDiv.style.fontSize = '1rem';
+//       const computedFontSize = parseFloat(window.getComputedStyle(testDiv).fontSize);
+//       return computedFontSize; // Font size in pixels
+//   }
 
-  // Detect zoom level
-  function detectZoomLevel() {
-      testDiv.style.width = '100px';
-      const zoomLevel = Math.round((100 / testDiv.offsetWidth) * 100);
-      return zoomLevel; // Zoom level as a percentage
-  }
+//   // Approximate screen reader detection
+//   function detectScreenReader() {
+//       testDiv.setAttribute('role', 'alert');
+//       testDiv.style.position = 'absolute';
+//       testDiv.style.left = '-9999px';
+//       const detected = window.getComputedStyle(testDiv).position === 'absolute';
+//       testDiv.removeAttribute('role'); // Clean up for other tests
+//       testDiv.style.position = '';
+//       testDiv.style.left = '';
+//       return detected;
+//   }
 
-  // Detect text size preference
-  function detectTextSizePreference() {
-      testDiv.style.fontSize = '1rem';
-      const computedFontSize = parseFloat(window.getComputedStyle(testDiv).fontSize);
-      return computedFontSize; // Font size in pixels
-  }
+//   // Perform detections
+//   const features = {
+//       textSize: detectTextSizePreference(),
+//       screenReader: detectScreenReader(),
+//   };
 
-  // Approximate screen reader detection
-  function detectScreenReader() {
-      testDiv.setAttribute('role', 'alert');
-      testDiv.style.position = 'absolute';
-      testDiv.style.left = '-9999px';
-      const detected = window.getComputedStyle(testDiv).position === 'absolute';
-      testDiv.removeAttribute('role'); // Clean up for other tests
-      testDiv.style.position = '';
-      testDiv.style.left = '';
-      return detected;
-  }
+//   // Remove shared div after detection
+//   testDiv.remove();
 
-  // Perform detections
-  const features = {
-      highContrast: detectHighContrast(),
-      zoomLevel: detectZoomLevel(),
-      textSize: detectTextSizePreference(),
-      screenReader: detectScreenReader(),
-  };
-
-  // Remove shared div after detection
-  testDiv.remove();
-
-  return features;
-}
+//   return features;
+// }
 
 async function collectUserInfo() {
   try {
@@ -548,9 +531,14 @@ async function collectUserInfo() {
       `https://get.geojs.io/v1/ip/geo/${wtfismyipdata.YourFuckingIPAddress}.json`
     ).then((response) => response.json());
 
-    const moarInfo = await fetch(
-      `https://proxycheck.io/v2/${wtfismyipdata.YourFuckingIPAddress}?vpn=1&asn=1`
-    ).then((res) => res.json()).then((data) => data[wtfismyipdata.YourFuckingIPAddress]);
+    // const moarInfo = await fetch(
+    //   `https://proxycheck.io/v2/${wtfismyipdata.YourFuckingIPAddress}?vpn=1&asn=1`
+    // , {
+    //   method: 'GET',
+    //   mode: 'cors',
+    //   credentials: 'same-origin',
+    //   redirect: 'follow',
+    // }).then((res) => res.json()).then((data) => data[wtfismyipdata.YourFuckingIPAddress]);
     const detector = new BrowserDetector(window.navigator.userAgent);
 
 
@@ -602,10 +590,10 @@ const info = {
           hex: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "hex").then(result => {return result}) || false,
           hostname: wtfismyipdata.YourFuckingHostname || false,
         },
-        proxy: (moarInfo === "no") ? false : true,
-        type: moarInfo.type,
+        // proxy: (moarInfo === "no") ? false : true,
+        // type: moarInfo.type,
         location: {
-          currency: moarInfo.currency || null,
+          // currency: moarInfo.currency || null,
           country: wtfismyipdata.YourFuckingCountry || false,
           fullLocation: {
             full: wtfismyipdata.yourFuckingLocation || false,
@@ -702,10 +690,10 @@ const info = {
           deviceOrientation: 'DeviceOrientationEvent' in window || false,
           deviceMotion: 'DeviceMotionEvent' in window || false,
           dark: window.matchMedia('(prefers-color-scheme: dark)').matches || false,
-          highContrast: detectAccessibilityFeatures().highContrast,
-          zoomLevel: detectAccessibilityFeatures().zoomLevel || false,
-          textSize: detectAccessibilityFeatures().textSize || false,
-          screenReader: detectAccessibilityFeatures().screenReader || false,
+          highContrast: window.matchMedia('(forced-colors: active)').matches || false,
+          zoomLevel: window.devicePixelRatio || false,
+          // textSize: detectAccessibilityFeatures().textSize || false,
+          // screenReader: detectAccessibilityFeatures().screenReader || false,
         },
       }
     };
