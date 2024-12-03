@@ -519,104 +519,61 @@ function checkLocalStorageSupport() {
 
 async function collectUserInfo() {
   try {
-    const wtfismyipdata = await fetch("https://wtfismyip.com/json").then(
+    const isOnline = navigator.onLine;
+
+    const wtfismyipdata = isOnline ? await fetch("https://wtfismyip.com/json").then(
       (res) => {
         return res.json()
       }
-    );
+    ) : null;
 
-    const wtfismylocation = await wtfismyipdata.yourFuckingLocation;
+    const wtfismylocation = isOnline ? wtfismyipdata.yourFuckingLocation : null;
 
-    const detailedIpInfo = await fetch(
+    const detailedIpInfo = isOnline ? await fetch(
       `https://get.geojs.io/v1/ip/geo/${wtfismyipdata.YourFuckingIPAddress}.json`
-    ).then((response) => response.json());
+    ).then((response) => response.json()) : null;
 
-    // const moarInfo = await fetch(
-    //   `https://proxycheck.io/v2/${wtfismyipdata.YourFuckingIPAddress}?vpn=1&asn=1`
-    // , {
-    //   method: 'GET',
-    //   mode: 'cors',
-    //   credentials: 'same-origin',
-    //   redirect: 'follow',
-    // }).then((res) => res.json()).then((data) => data[wtfismyipdata.YourFuckingIPAddress]);
     const detector = new BrowserDetector(window.navigator.userAgent);
 
+    const hasBattery = isOnline && navigator.getBattery() !== null && await navigator.getBattery().then(battery => {return typeof battery.level === 'number'});
 
-/*!
- *
- * detectIncognito v1.3.7
- *
- * https://github.com/Joe12387/detectIncognito
- *
- * MIT License
- *
- * Copyright (c) 2021 - 2024 Joe Rutkowski <Joe@dreggle.com>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- * Please keep this comment intact in order to properly abide by the MIT License.
- *
- **/
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.detectIncognito=t():e.detectIncognito=t()}(this,(function(){return function(){"use strict";var __webpack_modules__={598:function(__unused_webpack_module,exports){var __awaiter=this&&this.__awaiter||function(e,t,r,o){return new(r||(r=Promise))((function(n,i){function a(e){try{s(o.next(e))}catch(e){i(e)}}function c(e){try{s(o.throw(e))}catch(e){i(e)}}function s(e){var t;e.done?n(e.value):(t=e.value,t instanceof r?t:new r((function(e){e(t)}))).then(a,c)}s((o=o.apply(e,t||[])).next())}))},__generator=this&&this.__generator||function(e,t){var r,o,n,i,a={label:0,sent:function(){if(1&n[0])throw n[1];return n[1]},trys:[],ops:[]};return i={next:c(0),throw:c(1),return:c(2)},"function"==typeof Symbol&&(i[Symbol.iterator]=function(){return this}),i;function c(c){return function(s){return function(c){if(r)throw new TypeError("Generator is already executing.");for(;i&&(i=0,c[0]&&(a=0)),a;)try{if(r=1,o&&(n=2&c[0]?o.return:c[0]?o.throw||((n=o.return)&&n.call(o),0):o.next)&&!(n=n.call(o,c[1])).done)return n;switch(o=0,n&&(c=[2&c[0],n.value]),c[0]){case 0:case 1:n=c;break;case 4:return a.label++,{value:c[1],done:!1};case 5:a.label++,o=c[1],c=[0];continue;case 7:c=a.ops.pop(),a.trys.pop();continue;default:if(!(n=a.trys,(n=n.length>0&&n[n.length-1])||6!==c[0]&&2!==c[0])){a=0;continue}if(3===c[0]&&(!n||c[1]>n[0]&&c[1]<n[3])){a.label=c[1];break}if(6===c[0]&&a.label<n[1]){a.label=n[1],n=c;break}if(n&&a.label<n[2]){a.label=n[2],a.ops.push(c);break}n[2]&&a.ops.pop(),a.trys.pop();continue}c=t.call(e,a)}catch(e){c=[6,e],o=0}finally{r=n=0}if(5&c[0])throw c[1];return{value:c[0]?c[1]:void 0,done:!0}}([c,s])}}};function detectIncognito(){return __awaiter(this,void 0,Promise,(function(){return __generator(this,(function(_a){switch(_a.label){case 0:return[4,new Promise((function(resolve,reject){var browserName="Unknown";function __callback(e){resolve({isPrivate:e,browserName:browserName})}function identifyChromium(){var e=navigator.userAgent;return e.match(/Chrome/)?void 0!==navigator.brave?"Brave":e.match(/Edg/)?"Edge":e.match(/OPR/)?"Opera":"Chrome":"Chromium"}function assertEvalToString(e){return e===eval.toString().length}function feid(){var toFixedEngineID=0;try{eval("(-1).toFixed(-1);")}catch(e){toFixedEngineID=e.message.length}return toFixedEngineID}function isSafari(){return 44===feid()}function isChrome(){return 51===feid()}function isFirefox(){return 25===feid()}function isMSIE(){return void 0!==navigator.msSaveBlob&&assertEvalToString(39)}function newSafariTest(){var e=String(Math.random());try{window.indexedDB.open(e,1).onupgradeneeded=function(t){var r,o,n=null===(r=t.target)||void 0===r?void 0:r.result;try{n.createObjectStore("test",{autoIncrement:!0}).put(new Blob),__callback(!1)}catch(e){var i=e;return e instanceof Error&&(i=null!==(o=e.message)&&void 0!==o?o:e),"string"!=typeof i?void __callback(!1):void __callback(i.includes("BlobURLs are not yet supported"))}finally{n.close(),window.indexedDB.deleteDatabase(e)}}}catch(e){__callback(!1)}}function oldSafariTest(){var e=window.openDatabase,t=window.localStorage;try{e(null,null,null,null)}catch(e){return void __callback(!0)}try{t.setItem("test","1"),t.removeItem("test")}catch(e){return void __callback(!0)}__callback(!1)}function safariPrivateTest(){void 0!==navigator.maxTouchPoints?newSafariTest():oldSafariTest()}function getQuotaLimit(){var e=window;return void 0!==e.performance&&void 0!==e.performance.memory&&void 0!==e.performance.memory.jsHeapSizeLimit?performance.memory.jsHeapSizeLimit:1073741824}function storageQuotaChromePrivateTest(){navigator.webkitTemporaryStorage.queryUsageAndQuota((function(e,t){__callback(Math.round(t/1048576)<2*Math.round(getQuotaLimit()/1048576))}),(function(e){reject(new Error("detectIncognito somehow failed to query storage quota: "+e.message))}))}function oldChromePrivateTest(){(0,window.webkitRequestFileSystem)(0,1,(function(){__callback(!1)}),(function(){__callback(!0)}))}function chromePrivateTest(){void 0!==self.Promise&&void 0!==self.Promise.allSettled?storageQuotaChromePrivateTest():oldChromePrivateTest()}function firefoxPrivateTest(){__callback(void 0===navigator.serviceWorker)}function msiePrivateTest(){__callback(void 0===window.indexedDB)}function main(){isSafari()?(browserName="Safari",safariPrivateTest()):isChrome()?(browserName=identifyChromium(),chromePrivateTest()):isFirefox()?(browserName="Firefox",firefoxPrivateTest()):isMSIE()?(browserName="Internet Explorer",msiePrivateTest()):reject(new Error("detectIncognito cannot determine the browser"))}main()}))];case 1:return[2,_a.sent()]}}))}))}Object.defineProperty(exports,"__esModule",{value:!0}),exports.detectIncognito=void 0,exports.detectIncognito=detectIncognito,"undefined"!=typeof window&&(window.detectIncognito=detectIncognito),exports.default=detectIncognito}},__webpack_exports__={};return __webpack_modules__[598](0,__webpack_exports__),__webpack_exports__=__webpack_exports__.default,__webpack_exports__}()}));
-
-const hasBattery = navigator.getBattery() !== null && await navigator.getBattery().then(battery => {return typeof battery.level === 'number'});
-
-const info = {
+    const info = {
       networkInfo: {
-        downloadSpeed: navigator.connection.downlink || false,
-        generation: navigator.connection.effectiveType.toUpperCase(),
-        PingInfo: (await measurePing()),
+        downloadSpeed: isOnline ? navigator.connection.downlink : false,
+        generation: isOnline ? navigator.connection.effectiveType.toUpperCase() : false,
+        PingInfo: isOnline ? (await measurePing()) : null,
         ip: {
-          v4: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv4").then(result => {return result}) || false,
-          v6short: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6").then(result => {return result}) || false,
-          v6long: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6-full").then(result => {return result}) || false,
-          integer: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "integer").then(result => {return result}) || false,
-          hex: await IPConverter(wtfismyipdata.YourFuckingIPAddress, "hex").then(result => {return result}) || false,
-          hostname: wtfismyipdata.YourFuckingHostname || false,
+          v4: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv4").then(result => {return result}) : null,
+          v6short: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6").then(result => {return result}) : null,
+          v6long: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv6-full").then(result => {return result}) : null,
+          integer: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "integer").then(result => {return result}) : null,
+          hex: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "hex").then(result => {return result}) : null,
+          hostname: isOnline ? wtfismyipdata.YourFuckingHostname : null,
         },
-        // proxy: (moarInfo === "no") ? false : true,
-        // type: moarInfo.type,
         location: {
-          // currency: moarInfo.currency || null,
-          country: wtfismyipdata.YourFuckingCountry || false,
+          country: isOnline ? wtfismyipdata.YourFuckingCountry : null,
           fullLocation: {
-            full: wtfismyipdata.yourFuckingLocation || false,
+            full: isOnline ? wtfismyipdata.yourFuckingLocation : null,
             city: "city",
             region: "region",
             country: "country",
-            },
-          countryCode: {
-            alpha2: wtfismyipdata.YourFuckingCountryCode || false,
-            alpha3: detailedIpInfo.country_code3 || false,
           },
-          city: detailedIpInfo.city || false,
-          region: detailedIpInfo.region || false,
-          continentCode: detailedIpInfo.continent_code || false,
-          latitude: detailedIpInfo.latitude || false,
-          longitude: detailedIpInfo.longitude || false,
+          countryCode: {
+            alpha2: isOnline ? wtfismyipdata.YourFuckingCountryCode : null,
+            alpha3: isOnline ? detailedIpInfo.country_code3 : null,
+          },
+          city: isOnline ? detailedIpInfo.city : null,
+          region: isOnline ? detailedIpInfo.region : null,
+          continentCode: isOnline ? detailedIpInfo.continent_code : null,
+          latitude: isOnline ? detailedIpInfo.latitude : null,
+          longitude: isOnline ? detailedIpInfo.longitude : null,
         },
-        isp: wtfismyipdata.YourFuckingISP || false,
+        isp: isOnline ? wtfismyipdata.YourFuckingISP : null,
         organization: {
-          name: detailedIpInfo.organization_name || false,
-          asn: detailedIpInfo.asn || false,
+          name: isOnline ? detailedIpInfo.organization_name : null,
+          asn: isOnline ? detailedIpInfo.asn : null,
         },
-        torExit: wtfismyipdata.YourFuckingTorExit || false,
+        torExit: isOnline ? wtfismyipdata.YourFuckingTorExit : null,
       },
       systemInfo: {
         platform: detector.platform || false,
@@ -667,9 +624,9 @@ const info = {
       },
       timeInfo: {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || false,
-        ipTimezone: detailedIpInfo.timezone || false,
+        ipTimezone: isOnline ? detailedIpInfo.timezone : null,
         currentTime: AdvancedDateParsing(new Date().toLocaleString()) || false,
-        mismatchedTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone !== detailedIpInfo.timezone,
+        mismatchedTimezone: isOnline ? Intl.DateTimeFormat().resolvedOptions().timeZone !== detailedIpInfo.timezone : false,
       },
       browserState: {
         online: navigator.onLine || false,
@@ -680,9 +637,9 @@ const info = {
           navigator: navigator.doNotTrack || false,
         },
         cookiesEnabled: navigator.cookieEnabled || false,
-        isPrivate: await detectIncognito().then(function(result) {
+        isPrivate: isOnline ? await detectIncognito().then(function(result) {
           return result.isPrivate;
-        }) || false,
+        }) : false,
         localStorageSupported: checkLocalStorageSupport() || false,
         accessibility: {
           reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches || false,
@@ -691,13 +648,11 @@ const info = {
           deviceMotion: 'DeviceMotionEvent' in window || false,
           dark: window.matchMedia('(prefers-color-scheme: dark)').matches || false,
           highContrast: window.matchMedia('(forced-colors: active)').matches || false,
-          zoomLevel: window.devicePixelRatio || false,
-          // textSize: detectAccessibilityFeatures().textSize || false,
-          // screenReader: detectAccessibilityFeatures().screenReader || false,
+          zoomLevel: window.devicePixelRatio * 100 || false,
         },
       }
     };
-    const location = wtfismyipdata.YourFuckingLocation;
+    const location = isOnline ? wtfismyipdata.YourFuckingLocation : null;
     
     // Now parse the location when it's definitely loaded
     if (location) {
