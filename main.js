@@ -535,7 +535,7 @@ async function collectUserInfo() {
 
     const detector = new BrowserDetector(window.navigator.userAgent);
 
-    const hasBattery = (navigator.getBattery() !== null) ? true : false;
+    const hasBattery = (navigator.getBattery()) ? true : false;
 
     /*!
  *
