@@ -602,8 +602,8 @@ var AllowedNavigatorConnection = true;
     
     const info = {
       networkInfo: {
-        downloadSpeed: isOnline && AllowedNavigatorConnection ? navigator.connection.downlink : false,
-        generation: isOnline && AllowedNavigatorConnection ? navigator.connection.effectiveType.toUpperCase() : false,
+        downloadSpeed: isOnline ? (AllowedNavigatorConnection ? navigator.connection.downlink : false) : false,
+        generation: isOnline ? (AllowedNavigatorConnection ? navigator.connection.effectiveType.toUpperCase() : false) : false,
         PingInfo: isOnline ? (await measurePing()) : null,
         ip: {
           v4: isOnline ? await IPConverter(wtfismyipdata.YourFuckingIPAddress, "ipv4").then(result => {return result}) : null,
