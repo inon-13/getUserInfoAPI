@@ -694,7 +694,7 @@ var AllowedNavigatorConnection = true;
       browserState: {
         loadingType: {
           number: NavigationTypeAllowed ? performance.navigation.type : false,
-          word: NavigationEntryAllowed ? performance.getEntriesByType("navigation")[0].type
+          word: NavigationEntryAllowed ? performance.getEntriesByType("navigation")[0].type : false
             },
         online: navigator.onLine || false,
         touchSupport: "ontouchstart" in window || false,
