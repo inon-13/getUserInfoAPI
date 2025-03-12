@@ -689,7 +689,7 @@ var AllowedNavigatorConnection = true;
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || false,
         ipTimezone: isOnline ? detailedIpInfo.timezone : null,
         currentTime: AdvancedDateParsing(new Date().toLocaleString()) || false,
-        mismatchedTimezone: isOnline ? (Intl.DateTimeFormat().resolvedOptions().timeZone !== detailedIpInfo.timezone) : false,
+        mismatchedTimezone: isOnline && (Intl.DateTimeFormat().resolvedOptions().timeZone !== detailedIpInfo.timezone),
       },
       browserState: {
         loadingType: {
